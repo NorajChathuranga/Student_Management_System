@@ -1,192 +1,142 @@
-# EduPortal - Student Management System
+# EduPortal — Student Management System
 
-A full-stack student management system with React frontend and Spring Boot backend.
+EduPortal is a full‑stack student management system built with a Spring Boot REST API and a React (Vite) single‑page application. It supports role‑based workflows for administrators, teachers, and students.
 
-## Technology Stack
+## Table of Contents
 
-### Backend
-- Java 17
-- Spring Boot 3.2.2
-- Spring Security with JWT
-- Spring Data JPA
-- MySQL Database
-- Maven
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Configuration](#configuration)
+  - [Run Locally](#run-locally)
+- [API](#api)
+- [Project Structure](#project-structure)
+- [License](#license)
 
-### Frontend
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- shadcn/ui
-- Axios
-- React Router
+## Features
 
-## Prerequisites
+- Role‑based access control (ADMIN, TEACHER, STUDENT)
+- Class and subject management
+- Student enrollment and teacher assignment
+- Attendance tracking (single & bulk)
+- Marks/grades entry (single & bulk)
+- Admin dashboard statistics
 
-1. **Java 17** or higher
-2. **Node.js 18** or higher
-3. **MySQL 8.0** or higher
-4. **Maven 3.8** or higher
+## Tech Stack
 
-## Database Setup
+**Backend**
+- Java 17, Spring Boot 3.2.2
+- Spring Security (JWT)
+- Spring Data JPA (Hibernate)
+- MySQL
 
-1. Install and start MySQL server
-2. Create a database named `eduportal`:
-   ```sql
-   CREATE DATABASE eduportal;
-   ```
-3. Update the credentials in `backend/src/main/resources/application.properties` if needed:
-   ```properties
-   spring.datasource.username=root
-   spring.datasource.password=root
-   ```
+**Frontend**
+- React 18, TypeScript, Vite
+- Tailwind CSS + shadcn/ui
+- Axios, React Router
 
-## Backend Setup
+## Architecture
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+- **Frontend**: React SPA (Vite) calling the backend over HTTP.
+- **Backend**: Spring Boot REST API secured with JWT.
+- **Database**: MySQL via JPA/Hibernate (schema managed by `spring.jpa.hibernate.ddl-auto`).
 
-2. Build the project:
-   ```bash
-   mvn clean install
-   ```
+## Getting Started
 
-3. Run the application:
-   ```bash
-   mvn spring-boot:run
-   ```
+### Prerequisites
 
-The backend will start on `http://localhost:8080`
+- Java 17+
+- Maven 3.8+
+- Node.js 18+
+- MySQL 8.0+
 
-## Frontend Setup
+### Configuration
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
+#### Backend (Spring Boot)
 
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   bun install
-   ```
+Backend configuration lives in [backend/src/main/resources/application.properties](backend/src/main/resources/application.properties).
 
-3. Create a `.env` file (optional, defaults to localhost:8080):
-   ```env
-   VITE_API_BASE_URL=http://localhost:8080/api
-   ```
+Recommended environment overrides:
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   # or
-   bun dev
-   ```
+```bash
+# MySQL
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/eduportal
+SPRING_DATASOURCE_USERNAME=your_username
+SPRING_DATASOURCE_PASSWORD=your_password
 
-The frontend will start on `http://localhost:5173`
+# JWT
+JWT_SECRET=change_this_in_production
+JWT_EXPIRATION=86400000
 
-## User Roles
+# CORS (comma-separated)
+CORS_ALLOWED_ORIGINS=http://localhost:5173
+```
 
-The system supports three user roles:
+Notes:
+- The current datasource URL includes `createDatabaseIfNotExist=true`, so the database can be created automatically if MySQL is running.
+- For real deployments, always rotate `JWT_SECRET` and disable verbose security logging.
 
-1. **ADMIN** - Full access to all features
-   - Manage classes, subjects, students, and teachers
-   - View dashboard statistics
-   - Assign teachers to classes
-   - Enroll students in classes
+#### Frontend (Vite)
 
-2. **TEACHER** - Class and student management
-   - View assigned classes
-   - Mark attendance
-   - Enter student marks/grades
+Set the API base URL using Vite env vars:
 
-3. **STUDENT** - View personal information
-   - View enrolled classes
-   - View attendance records
-   - View marks and grades
+```env
+VITE_API_BASE_URL=http://localhost:8080/api
+```
 
-## API Endpoints
+Prefer `frontend/.env.local` for local development.
 
-### Authentication
-- `POST /api/auth/signup` - Register new user
-- `POST /api/auth/login` - Login and get JWT token
-- `GET /api/auth/me` - Get current user info
+### Run Locally
 
-### Users
-- `GET /api/users` - Get all users (Admin only)
-- `GET /api/users/students` - Get all students
-- `GET /api/users/teachers` - Get all teachers
+**Backend**
 
-### Classes
-- `GET /api/classes` - Get all classes
-- `POST /api/classes` - Create class (Admin)
-- `PUT /api/classes/{id}` - Update class (Admin)
-- `DELETE /api/classes/{id}` - Delete class (Admin)
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+```
 
-### Subjects
-- `GET /api/subjects` - Get all subjects
-- `POST /api/subjects` - Create subject (Admin)
-- `PUT /api/subjects/{id}` - Update subject (Admin)
-- `DELETE /api/subjects/{id}` - Delete subject (Admin)
+Backend: http://localhost:8080
 
-### Teacher Classes
-- `GET /api/teacher-classes/my-classes` - Get teacher's assigned classes
-- `POST /api/teacher-classes` - Assign teacher to class (Admin)
-- `DELETE /api/teacher-classes/{id}` - Remove assignment (Admin)
+**Frontend**
 
-### Student Classes
-- `GET /api/student-classes/my-classes` - Get student's enrolled classes
-- `POST /api/student-classes` - Enroll student (Admin)
-- `DELETE /api/student-classes/{id}` - Unenroll student (Admin)
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-### Attendance
-- `GET /api/attendance/my-attendance` - Get student's attendance
-- `GET /api/attendance/class/{classId}?date=YYYY-MM-DD` - Get class attendance
-- `POST /api/attendance` - Mark attendance (Teacher)
-- `POST /api/attendance/bulk` - Mark bulk attendance (Teacher)
+Frontend: http://localhost:5173
 
-### Marks
-- `GET /api/marks/my-marks` - Get student's marks
-- `GET /api/marks/class/{classId}/subject/{subjectId}` - Get class marks
-- `POST /api/marks` - Add mark (Teacher)
-- `POST /api/marks/bulk` - Add bulk marks (Teacher)
+## API
 
-### Dashboard
-- `GET /api/dashboard/stats` - Get dashboard statistics (Admin)
+Base path: `/api`
 
-## Default Users
+**Auth**
+- `POST /api/auth/signup` — Register a user
+- `POST /api/auth/login` — Login and receive JWT
+- `GET /api/auth/me` — Current user profile
 
-After starting the application, you can register new users through the signup page. The first user with ADMIN role will have full access.
+**Core resources**
+- Users: `/api/users`, `/api/users/students`, `/api/users/teachers`
+- Classes: `/api/classes`
+- Subjects: `/api/subjects`
+- Teacher assignment: `/api/teacher-classes`
+- Student enrollment: `/api/student-classes`
+- Attendance: `/api/attendance`
+- Marks: `/api/marks`
+- Dashboard stats: `/api/dashboard/stats`
 
 ## Project Structure
 
 ```
-├── backend/
-│   ├── src/main/java/com/eduportal/
-│   │   ├── config/         # Security & CORS configuration
-│   │   ├── controller/     # REST controllers
-│   │   ├── dto/            # Data Transfer Objects
-│   │   ├── entity/         # JPA entities
-│   │   ├── exception/      # Custom exceptions
-│   │   ├── repository/     # Data repositories
-│   │   ├── security/       # JWT & auth filters
-│   │   └── service/        # Business logic
-│   └── pom.xml
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── hooks/          # Custom hooks
-│   │   ├── lib/            # API client & utilities
-│   │   └── pages/          # Page components
-│   └── package.json
-│
-└── README.md
+backend/   # Spring Boot API
+frontend/  # React (Vite) SPA
+README.md
 ```
 
 ## License
 
-MIT License
+MIT — see [LICENSE](LICENSE).
